@@ -12,21 +12,23 @@ class LinearRegressor:
         self.gama = 1.0
         self.Q = 2
 
-    def linearRegression(self):
+    def linearRegression(self, intercept = True):
         train_data, train_label = np.array(self.X), np.array(self.y)
         N, d = train_data.shape
-        train_data = np.hstack((np.ones((N,1)), train_data))
+        if intercept:
+            train_data = np.hstack((np.ones((N,1)), train_data))
 
         w = lg.inv(train_data.T.dot(train_data)).dot(train_data.T).dot(train_label)
 
         return w
 
-    def ridge(self, alpha = 1.0):
+    def ridge(self, alpha = 1.0, intercept = True):
         train_data, train_label = np.array(self.X), np.array(self.y)
         N, d = train_data.shape
-        train_data = np.hstack((np.ones((N,1)), train_data))
+        if intercept:
+            train_data = np.hstack((np.ones((N,1)), train_data))
 
-        identity = np.identity(d+1)
+        identity = np.identity(d+1) if intercept else np.identity(d)
         w = lg.inv(train_data.T.dot(train_data)+alpha*identity).dot(train_data.T).dot(train_label)
 
         return w
@@ -75,4 +77,11 @@ if __name__ == '__main__':
     beta = l.kernel_ridge(1.0,'polynomial')
     print(beta)
     print(l.predict(beta,[0.8,0.1]))
-        
+
+    X = np.array([[1, 1], [1, 2], [2, 2], [2, 3]])
+    # y = 1 * x_0 + 2 * x_1 + 3
+    y = np.dot(X, np.array([1, 2])) + 3
+    lr = LinearRegressor(X,y)
+    print(lr.linearRegression(False))
+    print(lr.ridge(0.01,False))
+
