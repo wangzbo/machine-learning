@@ -15,7 +15,7 @@ class LogisticRegressor:
         train_data = np.hstack((np.ones((N,1)), train_data))
         w = np.random.randn(d+1)
 
-        #gradient decent
+        #gradient descent
         for i in range(iteration):
             gradient = 0
             for j in range(N):
