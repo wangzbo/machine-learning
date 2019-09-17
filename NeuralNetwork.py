@@ -45,15 +45,15 @@ class NeuralNetwork:
         return X, S
 
     def _compute_backward(self, S, s_l, x_l, label):
-        DETA = list()
+        DELTA = list()
         for l in range(len(self.W)):
             if l == 0:
-                deta_l = self._compute_grad_last_layer(s_l,x_l,label)
+                delta_l = self._compute_grad_last_layer(s_l,x_l,label)
             else:
-                deta_l = np.dot(self.W[len(self.W)-l],DETA[l-1])*(1-(np.tanh(S[len(self.W)-l-1]))**2)
-            DETA.append(deta_l)
-        DETA.reverse()
-        return DETA
+                delta_l = np.dot(self.W[len(self.W)-l],DELTA[l-1])*(1-(np.tanh(S[len(self.W)-l-1]))**2)
+            DELTA.append(delta_l)
+        DELTA.reverse()
+        return DELTA
 
     def _compute_grad_last_layer(self,s_l,x_l,label):
         #using cross entropy error
@@ -83,10 +83,10 @@ class NeuralNetwork:
                 for j in range(len(batches[bc])):
                     # for each layer
                     X, S = self._compute_forward(train_data[j])
-                    DETA = self._compute_backward(S,S[len(S)-1],X[len(X)-1],train_label[j])
+                    DELTA = self._compute_backward(S,S[len(S)-1],X[len(X)-1],train_label[j])
                      
                     for l in range(len(self.W)):
-                        W_grad[l] += np.outer(X[l],DETA[l])
+                        W_grad[l] += np.outer(X[l],DELTA[l])
                 
                 for l in range(len(self.W)):
                     W_grad[l] = W_grad[l]/(1.0*len(batches[bc]))
