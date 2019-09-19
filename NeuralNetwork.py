@@ -4,10 +4,12 @@ class NeuralNetwork:
     '''
     Attributes:
         X: input features of train data 
+        N, d: dimention of X
         y: labels of train data
         hiddenlayers: how many hidden layers in NN
         neurals: how many neurals for each hidden layer
         outlDimension: dimension of the output layer
+        W: weights of all layers
     '''
     
     def __init__(self, X, y, hiddenlayers, neurals, outlDimension):
@@ -139,7 +141,7 @@ if __name__ == '__main__':
          [0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1]]
 
     nn = NeuralNetwork(X,y,2,[3,5],4)
-    nn.trainNN(T=1000)
+    nn.trainNN(epoch=1000)
     #print(nn.W)
     print(nn.predict([2,2]))
     print(nn.predict([-6,3]))
