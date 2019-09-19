@@ -26,7 +26,7 @@ class NeuralNetwork:
         layers.extend(self.neurals)
         layers.extend([self.outlDimension])
         for i in range(len(layers)-1):
-            self.W.append(np.random.rand(layers[i], layers[i+1]))  
+            self.W.append(np.random.uniform(-1,1,(layers[i], layers[i+1])))  
 
     def _initialize_gradient(self):
         W_grad = list()
@@ -66,6 +66,7 @@ class NeuralNetwork:
             else:
                 delta_l = np.dot(self.W[len(self.W)-l],DELTA[l-1])*(1-(np.tanh(S[len(self.W)-l-1]))**2)
             DELTA.append(delta_l)
+            
         DELTA.reverse()
         return DELTA
 
@@ -77,11 +78,10 @@ class NeuralNetwork:
             if label[i] == 1:
                 y_hat_grad[i] -= 1
                 break
-
         #tanh_grad = 1-(np.tanh(s_l))**2
         return y_hat_grad
 
-    def trainNN(self, epoch=200, batch_size=4,learning_rate=0.01):
+    def trainNN(self, epoch=200, batch_size=4, learning_rate=0.01, alpha=0.01):
         #using BP
         self._initialize_weight()
         #batch number and data indexes for all batches
@@ -98,14 +98,13 @@ class NeuralNetwork:
                 for j in range(len(batches[bc])):
                     # for each data in the batch
                     X, S = self._compute_forward(train_data[j])
-                    DELTA = self._compute_backward(S,S[len(S)-1],train_label[j])
-                     
+                    DELTA = self._compute_backward(S,S[len(S)-1],train_label[j])                  
                     for l in range(len(self.W)):
                         W_grad[l] += np.outer(X[l],DELTA[l])
                 
                 for l in range(len(self.W)):
                     W_grad[l] = W_grad[l]/(1.0*len(batches[bc]))
-                    self.W[l] = self.W[l] - learning_rate*W_grad[l]
+                    self.W[l] = self.W[l] - learning_rate*(W_grad[l]+alpha*self.W[l]/(1+self.W[l]**2)**2)
 
     def predict(self, x):
         _x = x
@@ -116,9 +115,8 @@ class NeuralNetwork:
                 _x = np.exp(_s)/np.sum(np.exp(_s))
             else:
                 _x = np.tanh(_s)
-        
+                
         return _x
-
 
 if __name__ == '__main__':
 
