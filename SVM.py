@@ -3,7 +3,17 @@ from scipy import optimize
 import LogisticRegressor
 
 class SVM:
-    
+    '''
+    Arributes:
+        X: input features of train data
+        y: labels of train data
+        kernel: kernel used, supporting linear, polynomial and gaussian
+        theta: parameter in polynomial kernel
+        gama: parameter in polynomial and gaussian kernel
+        Q: parameter in polynomial kernel
+        w: weight
+        b: intercept
+    '''
     def __init__(self, X, y, kernel = 'linear',theta = 1.0, gama = 1.0, Q = 2):
         self.X = X
         self.y = y
@@ -25,9 +35,9 @@ class SVM:
             for j in range(N):
                 if self.kernel == 'linear':
                     Q[i][j] = np.inner(train_data[i], train_data[j])*train_label[i]*train_label[j]
-                elif self.kernel == 'polinomial':
+                elif self.kernel == 'polynomial':
                     Q[i][j] = ((np.inner(train_data[i],train_data[j])*self.gama+self.theta)**self.Q)*train_label[i]*train_label[j]
-                elif self.kernel == 'gaussion':
+                elif self.kernel == 'gaussian':
                     Q[i][j] = np.exp(-self.gama*np.sum((train_data[i]-train_data[j])**2))*train_label[i]*train_label[j]
         
         p = -1*np.ones(N)
@@ -51,17 +61,17 @@ class SVM:
             b = train_label[sv_alpha[0]] - np.inner(w, train_data[sv_alpha[0]])
             return np.sign(np.inner(w,x)+b)
 
-        elif self.kernel == 'polinomial':
+        elif self.kernel == 'polynomial':
             return np.sign(np.sum([alpha[i]*train_label[i]*((self.theta+self.gama*np.inner(self.X[i],x))**self.Q) for i in range(N)]))
 
-        elif self.kernel == 'gasussion':
+        elif self.kernel == 'gaussian':
             return np.sign(np.sum([alpha[i]*train_label[i]*np.exp(-self.gama*np.sum((self.X[i]-np.array(x))**2)) for i in range(N)]))
     
-    def probabilistic_svm(self, C = 1.0):
+    def probabilistic_svm(self, C = 1.0, iteration = 1000):
         self.svm(C)
         transform_features = np.array([np.inner(self.w,x)+self.b for x in self.X]).reshape(len(self.X),1)
         l = LogisticRegressor.LogisticRegressor(transform_features,self.y)
-        print(l.logisticRegression(10000))
+        print(l.logisticRegression(iteration))
         return l.logisticRegression()
 
     def svr(self, C = 1.0, epsilon = 1.0):
@@ -76,9 +86,9 @@ class SVM:
             for j in range(N):
                 if self.kernel == 'linear':
                     Q[i][j] = np.inner(train_data[i], train_data[j])
-                elif self.kernel == 'polinomial':
+                elif self.kernel == 'polynomial':
                     Q[i][j] = (np.inner(train_data[i],train_data[j])*self.gama+self.theta)**self.Q
-                elif self.kernel == 'gaussion':
+                elif self.kernel == 'gaussian':
                     Q[i][j] = np.exp(-self.gama*np.sum((train_data[i]-train_data[j])**2))
         
         fun = lambda _alpha: 0.5*(_alpha[:N]-_alpha[N:]).dot(Q).dot((_alpha[:N]-_alpha[N:]).T)+np.inner(epsilon-train_label,_alpha[:N])+np.inner(epsilon+train_label,_alpha[N:])
@@ -105,11 +115,11 @@ class SVM:
             b = train_label[sv_alpha[0]] - np.inner(w, train_data[sv_alpha[0]])
             return np.inner(w,x)+b
 
-        elif self.kernel == 'polinomial':
+        elif self.kernel == 'polynomial':
             beta = alpha_pos - alpha_neg
             return np.sum([beta[i]*((self.theta+self.gama*np.inner(self.X[i],x))**self.Q) for i in range(N)])
 
-        elif self.kernel == 'gasussion':
+        elif self.kernel == 'gaussian':
             beta = alpha_pos - alpha_neg
             return np.sum([beta[i]*np.exp(-self.gama*np.sum((self.X[i]-np.array(x))**2)) for i in range(N)])
 
@@ -119,6 +129,8 @@ if __name__ == '__main__':
     alpha = s.svm()
     print(s.predict_svm(alpha,[-2,2]))
 
-    s = SVM([[-4],[-3],[-2],[-1],[0],[1],[2],[3],[4],[5]],[11,5,1,-1,-1,1,5,11,19,29],'polinomial')
+    s = SVM([[-4],[-3],[-2],[-1],[0],[1],[2],[3],[4],[5]],[11,5,1,-1,-1,1,5,11,19,29],'polynomial')
     alpha = s.svr(1,0.2)
     print(s.predict_svr(alpha,[-10]))
+
+    
