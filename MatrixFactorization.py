@@ -3,6 +3,14 @@ import LinearRegressor
 
 class MatrixFactorization:
 
+    '''
+    Attributes:
+        R: matrix need to be factorized
+        d: dimension of the W, V matrix
+        M, N: dimension of the R matrix
+        W: extracted feature matrix
+        V: extracted feature matrix
+    '''
     def __init__(self, R, d):
         self.R = np.array(R)
         self.d = d
@@ -14,7 +22,7 @@ class MatrixFactorization:
         error = [(self.R[i][j]-np.inner(self.W[i],self.V[j]))**2 for i in range(self.M) for j in range(self.N) if not np.isnan(self.R[i][j])]
         return np.sum(error)/len(error)
     
-    def alternative_least_square(self):
+    def alternative_least_square(self, alpha_w = 0.01, alpha_v = 0.01):
         self.W = np.random.rand(self.M, self.d)
         self.V = np.random.rand(self.N, self.d)
         error_in = self._calError_in()
@@ -24,12 +32,12 @@ class MatrixFactorization:
                 v_indices = [j for j in range(self.N) if not np.isnan(self.R[i][j])]
                 R_mn = self.R[i, v_indices]
                 V_n = self.V[v_indices]
-                self.W[i] = LinearRegressor.LinearRegressor(V_n, R_mn).ridge(0.1,False)
+                self.W[i] = LinearRegressor.LinearRegressor(V_n, R_mn).ridge(alpha_w,False)
             for i in range(self.N):
                 w_indices = [j for j in range(self.M) if not np.isnan(self.R[j][i])]
                 R_mn = self.R[w_indices, i]
                 W_m = self.W[w_indices]
-                self.V[i] = LinearRegressor.LinearRegressor(W_m, R_mn).ridge(0.2,False)          
+                self.V[i] = LinearRegressor.LinearRegressor(W_m, R_mn).ridge(alpha_v,False)          
             error_in_old = error_in
             error_in = self._calError_in()
         '''
@@ -74,9 +82,10 @@ if __name__ == '__main__':
 
     #the d should not be too big
     mf = MatrixFactorization(R, 3)
-    mf.alternative_least_square()
+    mf.alternative_least_square(0.1,0.2)
     print(mf.predict(1,5))
     
     mf.SGD_matrix_factor(10000)
     print(mf.predict(1,5))
+    
     
