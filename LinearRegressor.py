@@ -52,7 +52,7 @@ class LinearRegressor:
             
             beta = lg.inv(K+alpha*np.identity(N)).dot(train_label)
             return beta
-        elif kernel == 'gaussion':
+        elif kernel == 'gaussian':
             K = np.zeros((N, N),dtype=np.float)
             for i in range(N):
                 for j in range(N):
@@ -66,7 +66,7 @@ class LinearRegressor:
             return np.inner(beta,np.array([1]+x))
         elif self.kernel == 'polynomial':
             return np.sum([beta[i]*((self.theta+self.gama*np.inner(self.X[i],x))**self.Q) for i in range(len(beta))])
-        elif self.kernel == 'gaussion':
+        elif self.kernel == 'gaussian':
             return np.sum([beta[i]*np.exp(-self.gama*np.sum((self.X[i]-np.array(x))**2)) for i in range(len(beta))])
 
 if __name__ == '__main__':
@@ -85,3 +85,6 @@ if __name__ == '__main__':
     print(lr.linearRegression(False))
     print(lr.ridge(0.01,False))
 
+
+    
+    
