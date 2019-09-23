@@ -3,6 +3,13 @@ import DecisionStump
 
 class AdaBoost:
 
+    '''
+    Attributes:
+        X: input features of train data
+        y: labels of train data
+        T: iteration number
+        u: data weight for each iteration
+    '''
     def __init__(self, X, y, T = 100):
         self.X = X
         self.y = y
@@ -41,7 +48,3 @@ if __name__ == '__main__':
     print(ab.adaboost_classification(paras, x))
 
         
-
-
-
-    
