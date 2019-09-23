@@ -4,6 +4,14 @@ from sklearn.ensemble import GradientBoostingRegressor
 
 class GBDTRegressor:
 
+    '''
+    Attributes:
+        X: input features of train data
+        y: labels of train data
+        n_trees: how many trees for boosting
+        max_depth: the max depth of each tree
+        trees_root: hold the parameters of trees
+    '''
     def __init__(self, X, y, n_trees = 100, max_depth = 5):
         self.X = X
         self.y = y
@@ -40,3 +48,5 @@ if __name__ == '__main__':
     gbm0 = GradientBoostingRegressor()
     gbm0.fit(X,y)
     print(gbm0.predict([[10,10]]))
+    
+    
