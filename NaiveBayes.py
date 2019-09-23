@@ -2,6 +2,14 @@ import numpy as np
 
 class NaiveBayes:
 
+    '''
+    Atributes:
+        X: input features of train data
+        y: labels of train data
+        classes: how many classes in labels of train data
+        prob_classes: probability of each class: P(C=k)
+        prob_conditional: conditional probability for each class: P(Xi=x|C=k)
+    '''
     def __init__(self, X, y):
         self.X = X
         self.y = y
@@ -13,7 +21,7 @@ class NaiveBayes:
         prob_classes = [np.sum(np.equal(self.y,cl))/(1.0*N) for cl in self.classes]
         return dict(zip(self.classes,prob_classes))
 
-    def _get_prob_conditional(self, N, d, alpha):
+    def _get_prob_conditional_multinomial(self, N, d, alpha):
         prob_conditional = []
         for i in range(d):
             features = np.array(self.X)[:,i]
@@ -32,7 +40,7 @@ class NaiveBayes:
         
         return prob_conditional
 
-    def _get_prob_conditional_gaussion(self, N , d):
+    def _get_prob_conditional_gaussian(self, N , d):
         prob_conditional = []
         for i in range(d):
             features = np.array(self.X)[:,i]
@@ -50,15 +58,15 @@ class NaiveBayes:
         train_data, train_label = np.array(self.X), np.array(self.y)
         N, d = train_data.shape
         self.prob_classes = self._get_prob_classes(N)
-        self.prob_conditional = self._get_prob_conditional(N, d, alpha)
+        self.prob_conditional = self._get_prob_conditional_multinomial(N, d, alpha)
 
-    def GaussionBayes(self):
+    def gaussianBayes(self):
         train_data, train_label = np.array(self.X), np.array(self.y)
         N, d = train_data.shape
         self.prob_classes = self._get_prob_classes(N)
-        self.prob_conditional = self._get_prob_conditional_gaussion(N, d)
+        self.prob_conditional = self._get_prob_conditional_gaussian(N, d)
 
-    def predict(self, x):
+    def predict_multinomial(self, x):
         pred_prob = 0
         pred_label = self.classes[0]
         for cl in self.classes:
@@ -76,7 +84,7 @@ class NaiveBayes:
         
         return pred_label
 
-    def predict_gaussion(self, x):
+    def predict_gaussian(self, x):
         pred_prob = 0
         pred_label = self.classes[0]
         for cl in self.classes:
@@ -97,23 +105,26 @@ class NaiveBayes:
 if __name__ == '__main__':
     n = NaiveBayes([[1,0,0,0],[0,1,0,1],[1,1,0,1],[0,1,1,1],[1,0,0,1],[0,0,0,0],[1,1,1,0],[0,1,1,1],[1,1,1,1],[0,0,1,1],[1,1,0,0],[1,1,0,0]],[0,0,1,1,0,0,1,1,1,1,0,0])
     n.multinomialBayes()
-    print(n.predict([1,0,1,1]))
-    print(n.predict([0,1,1,0]))
-    print(n.predict([0,0,0,0]))
-    print(n.predict([1,0,1,0]))
-    print(n.predict([0,0,1,0]))
-    print(n.predict([0,1,0,0]))
-    print(n.predict([0,0,0,1]))
+    print(n.predict_multinomial([1,0,1,1]))
+    print(n.predict_multinomial([0,1,1,0]))
+    print(n.predict_multinomial([0,0,0,0]))
+    print(n.predict_multinomial([1,0,1,0]))
+    print(n.predict_multinomial([0,0,1,0]))
+    print(n.predict_multinomial([0,1,0,0]))
+    print(n.predict_multinomial([0,0,0,1]))
 
     from sklearn import datasets
     iris = datasets.load_iris()
     g = NaiveBayes(iris.data, iris.target)
-    g.GaussionBayes()
-    print(g.predict_gaussion(iris.data[0]))
-    print(g.predict_gaussion(iris.data[22]))
-    print(g.predict_gaussion(iris.data[44]))
-    print(g.predict_gaussion(iris.data[66]))
-    print(g.predict_gaussion(iris.data[88]))
-    print(g.predict_gaussion(iris.data[110]))
-    print(g.predict_gaussion(iris.data[132]))
-    print(g.predict_gaussion([6,4,6,2]))
+    g.gaussianBayes()
+    print(g.predict_gaussian(iris.data[0]))
+    print(g.predict_gaussian(iris.data[22]))
+    print(g.predict_gaussian(iris.data[44]))
+    print(g.predict_gaussian(iris.data[66]))
+    print(g.predict_gaussian(iris.data[88]))
+    print(g.predict_gaussian(iris.data[110]))
+    print(g.predict_gaussian(iris.data[132]))
+    print(g.predict_gaussian([6,4,6,2]))
+
+    
+    
