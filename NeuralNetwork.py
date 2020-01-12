@@ -64,7 +64,7 @@ class NeuralNetwork:
             if l == 0:
                 delta_l = self._compute_grad_last_layer(s_l,label)
             else:
-                delta_l = np.dot(self.W[len(self.W)-l],DELTA[l-1])*(1-(np.tanh(S[len(self.W)-l-1]))**2)
+                delta_l = np.dot(DELTA[l-1],self.W[len(self.W)-l].T)*(1-(np.tanh(S[len(self.W)-l-1]))**2)
             DELTA.append(delta_l)
             
         DELTA.reverse()
@@ -72,13 +72,7 @@ class NeuralNetwork:
 
     def _compute_grad_last_layer(self,s_l,label):
         #gradient of cross entropy error to the input of softmax layer
-        y_hat = np.exp(s_l)/np.sum(np.exp(s_l))
-        y_hat_grad = y_hat
-        for i in range(len(label)):
-            if label[i] == 1:
-                y_hat_grad[i] -= 1
-                break
-        #tanh_grad = 1-(np.tanh(s_l))**2
+        y_hat_grad = np.array([np.exp(i)/np.sum(np.exp(i)) for i in s_l])-label
         return y_hat_grad
 
     def trainNN(self, epoch=200, batch_size=4, learning_rate=0.01, alpha=0.01):
@@ -94,16 +88,13 @@ class NeuralNetwork:
                 train_data = self.X[batches[bc]]
                 train_label = self.y[batches[bc]]
                 W_grad = self._initialize_gradient()
-                
-                for j in range(len(batches[bc])):
-                    # for each data in the batch
-                    X, S = self._compute_forward(train_data[j])
-                    DELTA = self._compute_backward(S,S[len(S)-1],train_label[j])                  
-                    for l in range(len(self.W)):
-                        W_grad[l] += np.outer(X[l],DELTA[l])
-                
+
+                X, S = self._compute_forward(train_data)
+                DELTA = self._compute_backward(S,S[-1],train_label)                  
                 for l in range(len(self.W)):
-                    W_grad[l] = W_grad[l]/(1.0*len(batches[bc]))
+                    for j in range(len(batches[bc])):
+                        W_grad[l] += np.outer(X[l][j],DELTA[l][j])
+                    W_grad[l] = W_grad[l]/len(batches[bc])
                     self.W[l] = self.W[l] - learning_rate*(W_grad[l]+alpha*self.W[l]/(1+self.W[l]**2)**2)
 
     def predict(self, x):
@@ -139,7 +130,7 @@ if __name__ == '__main__':
          [0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1]]
 
     nn = NeuralNetwork(X,y,2,[3,5],4)
-    nn.trainNN(epoch=1000)
+    nn.trainNN()
     #print(nn.W)
     print(nn.predict([2,2]))
     print(nn.predict([-6,3]))
